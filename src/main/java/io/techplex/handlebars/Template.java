@@ -10,5 +10,13 @@ package io.techplex.handlebars;
  * @author techplex
  */
 public class Template {
+
+	Template(Handlebars aThis, String jstpl) {
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
+
+	String getCompiledTemplate() {
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
 	
 }

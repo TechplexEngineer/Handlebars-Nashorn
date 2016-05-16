@@ -9,10 +9,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 /**
  *
@@ -20,33 +23,38 @@ import javax.script.ScriptEngineManager;
  */
 public class Handlebars {
 	
-	//Handlebars should share the script engine...
-	private static ScriptEngine engine;
+	//Handlebars should share the script engine
+	private ScriptEngine engine;
+	
+	private List<Template> templates;
 	
 	
 	public Handlebars() {
-		if (engine == null) {
-			engine = new ScriptEngineManager().getEngineByName("nashorn");
-			InputStream is = this.getClass().getResourceAsStream("/handlebars-v4.0.5.js");
-			System.out.println(is);
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String readLine;
-			
-			try {
-				while (((readLine = br.readLine()) != null)) {
-					System.out.println(readLine);
-				}
-			} catch (IOException ex) {
-				Logger.getLogger(Handlebars.class.getName()).log(Level.SEVERE, null, ex);
-			}
+		engine = new ScriptEngineManager().getEngineByName("nashorn");
+		InputStream is = this.getClass().getResourceAsStream("/handlebars-v4.0.5.js");
+		try {
+			engine.eval(new InputStreamReader(is));
+		} catch (ScriptException ex) {
+			Logger.getLogger(Handlebars.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 
-	Template compile(String string) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	Template compile(String tplstr) {
+		Invocable inv = (Invocable) this.engine;
+		try {
+			String jstpl = (String)inv.invokeFunction("Handlebars.compile", tplstr);
+			Template tpl = new Template(this, jstpl);
+			return tpl;
+		} catch (ScriptException | NoSuchMethodException ex) {
+			Logger.getLogger(Handlebars.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		return null;
 	}
 	
-
+	String render(Template tpl) {
+		String jstpl = tpl.getCompiledTemplate();
+		
+		
+	}
 	
 }
